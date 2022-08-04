@@ -12,3 +12,5 @@ const config = require("./config.json")
 // }
 
 console.log(fs.readdirSync(config.contentPath))
+console.log(process.env.PWD);
+console.log(__dirname)
