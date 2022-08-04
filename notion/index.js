@@ -5,9 +5,9 @@ const worker = require("./lib/workers")
 const core = require("@actions/core")
 
 async function main () {
-    core.setOutput("result", "false")
+    const output = core.setOutput("update_result", "false")
     const result = await worker.update()
-    console.log(result)
+    console.log(result, JSON.stringify(output))
 }
 
 
