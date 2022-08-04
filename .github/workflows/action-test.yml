@@ -22,9 +22,11 @@ jobs:
         run: |
           npm install
           npm run update
-      - name: commit
-        if: ${{ steps.notion_update.outputs.result }} == "true"
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'botbotbot'
-          add: 'sample.txt'
+      - name: output tester
+        run: echo "${{ steps.notion_update.outputs.update_result }}"
+      # - name: commit
+      #   if: ${{ steps.notion_update.outputs.result }} == "true"
+      #   uses: EndBug/add-and-commit@v9
+      #   with:
+      #     message: 'botbotbot'
+      #     add: 'sample.txt'
