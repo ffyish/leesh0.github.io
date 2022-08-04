@@ -11,10 +11,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - run: echo "123" > sample.txt
-
-      - uses: EndBug/add-and-commit@v9
+      - uses: actions/setup-node@v3
         with:
-          message: 'botbotbot'
-          add: 'sample.txt'
+          node-version: 16
+
+      - run: npm run notion
+      # - run: echo "123" > sample.txt
+      # - uses: EndBug/add-and-commit@v9
+      #   with:
+      #     message: 'botbotbot'
+      #     add: 'sample.txt'
