@@ -4,11 +4,11 @@ const config = require("./config.json")
 const worker = require("./lib/workers")
 const core = require("@actions/core")
 
-async function main() {
+async function main () {
+    core.setOutput("result", "false")
     const result = await worker.update()
     console.log(result)
 }
 
 
-main();
-core.setOutput("result", false)
+main()
