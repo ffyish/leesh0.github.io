@@ -10,5 +10,8 @@
     "dotenv": "^16.0.1",
     "ioredis": "^5.2.2",
     "octokit": "^2.0.4"
+  },
+  "script":{
+    "update": "node index.js"
   }
 }
