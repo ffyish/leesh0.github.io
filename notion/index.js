@@ -7,7 +7,7 @@ const core = require("@actions/core")
 async function main () {
     core.setOutput("update_result", "false")
     const result = await worker.update()
-    console.log(result, JSON.stringify(output))
+    console.log(result)
 }
 
 
