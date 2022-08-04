@@ -1,0 +1,14 @@
+{
+  "name": "vercel-function",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/leesh0/vercel-notion-actions.git",
+  "author": "suumokr <notedev.jp@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/client": "^2.1.1",
+    "dotenv": "^16.0.1",
+    "ioredis": "^5.2.2",
+    "octokit": "^2.0.4"
+  }
+}
