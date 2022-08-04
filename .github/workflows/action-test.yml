@@ -14,14 +14,17 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-
       - name: notion update
         working-directory: ./notion
+        id: notion_update
+        env:
+          NOTION_TOKEN: ${{secrets.NOTION_TOKEN}}
         run: |
           npm install
           npm run update
-      # - run: echo "123" > sample.txt
-      # - uses: EndBug/add-and-commit@v9
-      #   with:
-      #     message: 'botbotbot'
-      #     add: 'sample.txt'
+      - name: commit
+        if: ${{ steps.notion_update.outputs.result }} == "true"
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'botbotbot'
+          add: 'sample.txt'
