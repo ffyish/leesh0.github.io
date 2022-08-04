@@ -7,8 +7,8 @@ const core = require("@actions/core")
 async function main() {
     const result = await worker.update()
     console.log(result)
-    core.setOutput("result", false)
 }
 
 
-main()
+main();
+core.setOutput("result", false)
