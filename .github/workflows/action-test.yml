@@ -15,8 +15,9 @@ jobs:
         with:
           node-version: 16
 
-      - run: cd notion
-      - run: npm run update
+      - name: notion update
+        working-directory: ./notion
+        run: npm run update
       # - run: echo "123" > sample.txt
       # - uses: EndBug/add-and-commit@v9
       #   with:
