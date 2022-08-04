@@ -6,12 +6,13 @@
   "author": "suumokr <notedev.jp@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@actions/core": "^1.9.0",
     "@notionhq/client": "^2.1.1",
     "dotenv": "^16.0.1",
     "ioredis": "^5.2.2",
     "octokit": "^2.0.4"
   },
-  "scripts":{
+  "scripts": {
     "update": "node index.js"
   }
 }

@@ -1,76 +1,50 @@
 const notion = require('./notion/utils')
-const github = require('./github/utils')
-const { redis } = require('./redis/client')
+const config = require("../config.json")
+const fs = require("fs")
+const path = require("path")
 
-const decodeBase64 = (b) => {
-    const stringify = Buffer.from(b, 'base64').toString()
-    return JSON.parse(stringify)
-}
+const rootDir = process.env.PWD
+const contentDir = path.resolve(rootDir, config.contentPath)
 
-const getContentList = async (owner, repo) => {
-    const root = await github.getRepoRoot(owner, repo, 'main')
-    let contentSha
-    for (const t of root.data.tree) {
-        if (t.path === 'content') {
-            contentSha = t.sha
-        }
-    }
-    const seriesData = (
-        await github.readFile(owner, repo, 'content/series.json')
-    ).data.content
 
-    if (contentSha) {
-        return {
-            posts: (await github.getTree(owner, repo, contentSha)).data.tree
-                .filter((e) => e.path !== 'series.json')
-                .map((e) => ({ path: e.path, sha: e.sha })),
-            series: decodeBase64(seriesData),
-        }
-    } else {
-        return false
-    }
-}
 
-module.exports.checkNotionUpdates = async (owner, repo) => {
-    const lastUpdate = await redis.get('last_update')
-    const notionData = await notion.checkUpdate()
-    const files = await getContentList(owner, repo)
-    let baseTime = lastUpdate ? lastUpdate : 0
+module.exports.update = async () => {
+    const savedSeries = JSON.parse(fs.readFileSync(path.resolve(contentDir, "series.json")))
+    const savedContents = (fs.readdirSync(contentDir)).filter(f => f !== "series.json").map(f => f.split(".")[0])
+    
+    const postsList = await notion.getDB(config.postsDB)
+    const seriesList = await notion.getDB(config.seriesDB)
 
-    const allPostsID = notionData.posts.map((p) => p.id)
-    const allPostsFilesID = files.posts.map((f) => f.path.split('.')[0])
+    postsList.forEach(post => {
+        post.created = new Date(post.created_time).getTime()
+        post.updated = new Date(post.last_edited_time).getTime()
+    })
+    seriesList.forEach(series => {
+        series.created = new Date(series.created_time).getTime()
+        series.updated = new Date(series.last_edited_time).getTime()
+    })
 
-    const updatedPosts = notionData.posts
-        .filter((p) => p.updated >= baseTime)
-        .map((p) => p.id)
+    const postsIds = postsList.map(p => p.id)
+    const seriesIds = seriesList.map(s=>s.id)
 
-    const deletedPosts = allPostsID.filter((p) => !allPostsFilesID.includes(p))
+    const updatedPosts = postsList.filter(post => post.updated >= config.lastExcute)
+    const deletedPosts = postsList.filter(post => !savedContents.includes(post.id))
+    const deletePosts = savedContents.filter(c => !postsIds.includes(c))
+    
+    const savedSeriesIds = savedSeries.map(s=>s.id)
+    const updatedSeries = seriesList.filter(series => series.updated >= config.lastExcute)
+    const deletedSeries = seriesList.filter(series => !savedSeriesIds.includes(series.id))
+    const deleteSeries = savedSeriesIds.filter(s=> !seriesIds.includes(s))
 
-    const allSeriesID = notionData.series.map((s) => s.id)
-    const allSeriesFilesID = files.series.map((f) => f.id)
-    const updatedSeries = notionData.series
-        .filter((s) => s.updated >= baseTime)
-        .map((s) => s.id)
-    const deletedSeries = allSeriesID.filter((s) =>
-        allSeriesFilesID.includes(s)
-    )
-
-    const result = {
+    const receipt = {
         posts: {
             update: [...new Set([...updatedPosts, ...deletedPosts])],
-            delete: files.posts.filter(
-                (file) => !allPostsID.includes(file.path.split('.')[0])
-            ),
+            delete: deletePosts
         },
         series: {
             update: [...new Set([...updatedSeries, ...deletedSeries])],
-            delete: allSeriesFilesID.filter((id) => !allSeriesID.includes(id)),
-        },
+            delete: deleteSeries
+        }
     }
-
-    console.log(result)
-
-    // await redis.set('last_update', new Date().getTime())
-    // console.log(lastUpdate)
-    return notionData.db
+    return receipt
 }
