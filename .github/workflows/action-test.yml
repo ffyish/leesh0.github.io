@@ -23,7 +23,7 @@ jobs:
           npm install
           npm run update
       - name: output tester
-        if: ${{ steps.notion_update.outputs.update_result }} == "true"
+        if: ${{ steps.notion_update.outputs.update_result == 'true' }}
         run: echo "${{ steps.notion_update.outputs.update_result }}"
       # - name: commit
       #   if: ${{ steps.notion_update.outputs.result }} == "true"
