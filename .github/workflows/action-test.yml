@@ -18,9 +18,8 @@ jobs:
       - name: notion update
         working-directory: ./notion
         run: |
-        npm install
-        npm run update
-
+          npm install
+          npm run update
       # - run: echo "123" > sample.txt
       # - uses: EndBug/add-and-commit@v9
       #   with:
